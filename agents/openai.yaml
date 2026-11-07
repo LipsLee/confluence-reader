@@ -1,0 +1,4 @@
+interface:
+  display_name: "Confluence Reader"
+  short_description: "Read, search, and export Confluence pages"
+  default_prompt: "Read this Confluence page and summarize it: <URL>"
