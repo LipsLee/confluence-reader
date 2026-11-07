@@ -1,4 +1,4 @@
 interface:
-  display_name: "Confluence Reader"
-  short_description: "Read, search, and export Confluence pages"
-  default_prompt: "Read this Confluence page and summarize it: <URL>"
+  display_name: "Confluence Agent"
+  short_description: "Search, read, and safely update Confluence pages"
+  default_prompt: "Search Confluence for PLC documentation and summarize the newest pages with versions and source URLs."

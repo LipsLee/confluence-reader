@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "confluence-reader"
+version = "2.0.0"
+description = "Read and write Confluence Cloud and Data Center through a local MCP server and CLI."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "LipsLee" }]
+keywords = ["confluence", "mcp", "codex", "atlassian", "knowledge-base"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Documentation",
+]
+dependencies = [
+  "mcp>=2.0,<3",
+  "markdown-it-py>=3,<5",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8,<10",
+  "ruff>=0.9,<1",
+]
+
+[project.scripts]
+confluence = "confluence_reader.cli:main"
+confluence-mcp = "confluence_reader.mcp_server:main"
+
+[project.urls]
+Repository = "https://github.com/LipsLee/confluence-reader"
+Issues = "https://github.com/LipsLee/confluence-reader/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/confluence_reader"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/confluence_reader",
+  "scripts",
+  "references",
+  "agents",
+  "SKILL.md",
+  "README.md",
+  "CHANGELOG.md",
+  "pyproject.toml",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
