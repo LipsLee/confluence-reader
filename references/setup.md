@@ -5,6 +5,31 @@ Confluence site. The recommended installer is
 [uv](https://docs.astral.sh/uv/). The MCP server is local `stdio`; no inbound
 port or web server is opened.
 
+## Fast setup
+
+The recommended path is the interactive wizard. It hides token input, writes a
+user-only config file, tests access, and prints an MCP configuration snippet.
+
+1. Create an Atlassian API token at
+   <https://id.atlassian.com/manage-profile/security/api-tokens>.
+2. Run the wizard from an interactive terminal:
+
+   ```powershell
+   $skill = Join-Path $HOME ".codex\skills\confluence-reader"
+   uv run --project $skill confluence setup
+   ```
+
+3. Enter the Confluence base URL, account email, and token when prompted.
+   Choose whether normal writes should be enabled. The token is never echoed.
+4. Start a new agent turn and verify:
+
+   ```powershell
+   uv run --project $skill confluence doctor --json
+   ```
+
+Do not send a token to an agent chat. If the wizard cannot run interactively,
+use the manual JSON configuration below.
+
 ## Install
 
 ### Windows PowerShell

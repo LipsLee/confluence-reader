@@ -12,6 +12,30 @@ move pages within a space, trash, restore, and restore historical versions.
 The MCP server name is `confluence`. Prefer its tools when available. The CLI
 exposes the same operations when MCP tools are not registered.
 
+## First-run setup
+
+If `confluence_status` or `doctor` reports missing configuration, `auth: none`,
+or `403 caller cannot access Confluence`:
+
+1. Do not ask the user to paste a token, password, Cookie, or Authorization
+   header into chat.
+2. Tell the user to create a scoped Atlassian API token at
+   <https://id.atlassian.com/manage-profile/security/api-tokens>.
+3. Ask the user to run the setup wizard in their own terminal:
+
+   ```powershell
+   $skill = Join-Path $HOME ".codex\skills\confluence-reader"
+   uv run --project $skill confluence setup
+   ```
+
+   The wizard reads the token with hidden input, writes a protected local
+   configuration, and tests the connection. It also supports Data Center PATs.
+4. Start a new turn after setup, then verify with `confluence_status` or
+   `doctor`. Never treat browser login state as API authentication.
+
+For non-interactive or manual deployment, use the JSON configuration and scope
+guidance in [references/setup.md](references/setup.md).
+
 ## Check access first
 
 Use:
@@ -138,6 +162,8 @@ For complete MCP/CLI contracts, read:
 - `AUTH_FAILED`: the email/token pair, PAT, or auth mode is wrong.
 - `PERMISSION_DENIED`: the account cannot perform this operation.
 - `NOT_FOUND`: the id, title, URL, or endpoint is wrong, or access is restricted.
+- `CONFIG_ERROR`: ask the user to run `confluence setup` locally; do not request
+  the secret in chat.
 - `VERSION_CONFLICT`: re-read and reconcile before retrying.
 - `WRITES_DISABLED`: the server is read-only or anonymous.
 - `UNSUPPORTED_ON_SITE`: the target platform does not expose a safe equivalent.

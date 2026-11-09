@@ -5,12 +5,12 @@ Confluence site. The process does not open a network port. The examples below
 use a checkout at `C:\tools\confluence-reader`; replace it with your absolute
 path.
 
-The MCP server is designed for the `v2.0.0` release. If you install from the
-repository, check out or install `v2.0.0` explicitly when you need a fixed
+The MCP server is designed for the `v2.1.0` release. If you install from the
+repository, check out or install `v2.1.0` explicitly when you need a fixed
 version:
 
 ```powershell
-git clone --branch v2.0.0 https://github.com/LipsLee/confluence-reader.git C:\tools\confluence-reader
+git clone --branch v2.1.0 https://github.com/LipsLee/confluence-reader.git C:\tools\confluence-reader
 uv sync --project C:\tools\confluence-reader
 ```
 

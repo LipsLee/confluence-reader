@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.0
+
+- Added `confluence setup`, an interactive wizard that validates Cloud and Data
+  Center settings, reads tokens with hidden input, writes a user-only config,
+  tests access, and prints an optional MCP configuration.
+- Added a three-step quick start for distribution and first-run guidance that
+  keeps credentials out of agent chat and does not reuse browser cookies.
+- Preserved manual environment-variable and JSON configuration for automation.
+
 ## 2.0.0
 
 - Added a local `stdio` MCP server with 20 read, write, and confirmed

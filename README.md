@@ -7,8 +7,70 @@ servers.
 
 This project is not affiliated with Atlassian.
 
+## Quick start
+
+### 1. Install
+
+```powershell
+$skill = Join-Path $HOME ".codex\skills\confluence-reader"
+git clone --branch v2.1.0 https://github.com/LipsLee/confluence-reader.git $skill
+uv tool install --editable $skill
+```
+
+On macOS or Linux, use the equivalent POSIX paths:
+
+```bash
+skill="${CODEX_HOME:-$HOME/.codex}/skills/confluence-reader"
+git clone --branch v2.1.0 https://github.com/LipsLee/confluence-reader.git "$skill"
+uv tool install --editable "$skill"
+```
+
+### 2. Configure locally
+
+Create an Atlassian API token at
+<https://id.atlassian.com/manage-profile/security/api-tokens>, then run:
+
+```powershell
+uv run --project $skill confluence setup
+```
+
+The wizard asks for the base URL and account email, reads the token with hidden
+input, writes a protected local config file, and tests the connection. The
+token is never accepted as a command-line argument and should never be pasted
+into an agent chat. Browser login state is not reused.
+
+After installation, a user can give another agent this instruction:
+
+```text
+Install and configure the Confluence Agent skill from
+https://github.com/LipsLee/confluence-reader at v2.1.0. Run `confluence setup`
+in my terminal for local credential entry, never ask me to paste a token into
+chat, then verify the connection and report the result.
+```
+
+### 3. Start using it
+
+Start a new Codex turn and ask for a Confluence search or page. MCP registration
+is optional: when MCP tools are not available, the Skill uses the CLI
+equivalents. To add structured MCP tools, use the client configuration in
+[references/clients.md](references/clients.md).
+
+## 中文快速开始
+
+1. 把仓库安装到 Codex Skill 目录，并执行 `uv tool install --editable $skill`。
+2. 打开 [Atlassian API Token](https://id.atlassian.com/manage-profile/security/api-tokens)
+   创建 Token。
+3. 运行 `uv run --project $skill confluence setup`，在本地按提示输入站点地址、邮箱和
+   Token。Token 使用隐藏输入，不会显示，也不应发送到聊天中。
+4. 向导会写入受保护的配置文件、测试连接，并输出可选的 MCP 配置。
+5. 新开一轮对话即可使用。
+
+私有 Confluence 站点不能靠匿名访问或浏览器登录 Cookie 使用 API；必须使用用户自己的
+API Token 或 PAT。Token 只继承该账户原本拥有的 Confluence 权限。
+
 ## What v2 provides
 
+- Interactive `confluence setup` with hidden token entry and connection testing
 - Permission-filtered search and reading across spaces visible to the account
 - Create pages, replace content, append content, and change titles
 - Add comments and labels
@@ -223,7 +285,7 @@ Start a new Codex turn after changing MCP configuration.
 
 Use the same local `stdio` server shape with server name `confluence`. Complete
 examples for Codex, Claude Desktop, Cursor, and generic clients are in
-[references/clients.md](references/clients.md). The `v2.0.0` release examples
+[references/clients.md](references/clients.md). The `v2.1.0` release examples
 use a local checkout; pin the checkout or release when reproducibility matters.
 
 One service process is bound to one Confluence site. For multiple sites, start
@@ -360,7 +422,7 @@ Optional test credentials are `CONFLUENCE_TEST_EMAIL`,
 - Archived pages and cross-space moves are outside the supported lifecycle.
 - Large exports and rate limits are bounded by client settings and Confluence.
 
-## 中文快速开始
+## 中文说明
 
 这是一个本地 MCP 服务加 Codex Skill，可以使用你自己的账户读取和修改
 Confluence Cloud 或 Data Center。它不使用管理员共享密钥，也不会绕过 Confluence

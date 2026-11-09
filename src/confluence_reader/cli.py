@@ -14,6 +14,7 @@ from .config import Config
 from .errors import ConfluenceReaderError, ValidationError
 from .markdown import storage_to_markdown
 from .service import ConfluenceService
+from .setup_wizard import TOKEN_URL, run_setup
 from .utils import (
     format_size,
     page_breadcrumb,
@@ -67,6 +68,43 @@ def cmd_doctor(args: argparse.Namespace) -> int:
             suffix = f" - {check.get('error')}" if check.get("error") else ""
             print(f"  [{status}] {check.get('name')}{suffix}")
     return 0 if result.get("reachable") else 1
+
+
+def cmd_setup(args: argparse.Namespace) -> int:
+    if not args.json:
+        print(f"Create or manage an Atlassian API token here: {TOKEN_URL}")
+        print("The token is entered locally and is never printed or stored in chat.")
+    result = run_setup(args)
+    if args.json:
+        print_json(result)
+    else:
+        print(f"Configuration saved: {result['config_path']}")
+        print(f"Site: {result['base_url']}")
+        print(f"Auth: {result['auth']}")
+        print(f"Writes enabled: {'yes' if result['writes_enabled'] else 'no'}")
+        if result.get("reachable") is True:
+            user = result.get("user") or {}
+            name = user.get("displayName") or user.get("username") or user.get("accountId")
+            print(f"Connection: OK{f' ({name})' if name else ''}")
+        elif result.get("reachable") is False:
+            error = result.get("error") or {}
+            print(
+                "Connection: FAILED"
+                + (f" [{error.get('code')}] {error.get('message')}" if error else "")
+            )
+            for check in result.get("checks") or []:
+                if not check.get("ok") and check.get("error"):
+                    print(f"  {check.get('name')}: {check.get('error')}")
+        else:
+            print("Connection: not checked")
+        if result.get("environment_overrides"):
+            print(
+                "Warning: these environment variables take precedence over the saved file: "
+                + ", ".join(result["environment_overrides"])
+            )
+        print("\nOptional MCP client configuration:\n")
+        print(result["mcp_config"])
+    return 0 if result.get("reachable") is not False else 1
 
 
 def cmd_status(args: argparse.Namespace) -> int:
@@ -561,6 +599,34 @@ def build_parser() -> argparse.ArgumentParser:
         "doctor", parents=[common], help="Check configuration and authentication"
     )
     doctor.set_defaults(func=cmd_doctor)
+
+    setup = subparsers.add_parser(
+        "setup",
+        help="Interactively create a protected local configuration",
+    )
+    setup.add_argument("--base-url", help="Confluence base URL")
+    setup.add_argument("--email", help="Atlassian account email for Cloud")
+    setup.add_argument("--config", help="Path to write the JSON configuration")
+    setup.add_argument("--mode", choices=("auto", "cloud", "data_center"), default="auto")
+    setup.add_argument("--timeout", type=float)
+    setup.add_argument("--insecure", action="store_true", help="Disable TLS verification")
+    setup.add_argument("--json", action="store_true", help="Print machine-readable JSON")
+    setup.add_argument("--verbose", action="store_true", help="Show traceback on failure")
+    setup.add_argument("--no-verify", action="store_true", help="Save without testing access")
+    writes = setup.add_mutually_exclusive_group()
+    writes.add_argument(
+        "--read-only",
+        dest="enable_writes",
+        action="store_false",
+        help="Disable create, update, comment, label, and attachment writes",
+    )
+    writes.add_argument(
+        "--enable-writes",
+        dest="enable_writes",
+        action="store_true",
+        help="Enable normal write operations",
+    )
+    setup.set_defaults(func=cmd_setup, enable_writes=None)
 
     status = subparsers.add_parser(
         "status", parents=[common], help="Show site capabilities without probing by default"
